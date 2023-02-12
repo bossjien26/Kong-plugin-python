@@ -1,0 +1,4 @@
+plugins=bundled,py-hello
+pluginserver_names=go,py
+pluginserver_py_socket=/mnt/kong-plugins/py-hello.sock
+pluginserver_py_query_cmd=/mnt/kong-plugins/py-hello.py -d

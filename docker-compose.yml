@@ -1,0 +1,93 @@
+version: '3'
+
+networks:
+  kong-net:
+
+services:
+  kong:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kong
+    user: "${KONG_USER:-root}"
+    # depends_on:
+    #   - db
+    environment:
+      - KONG_DATABASE=off #database=off for `dbless` mode
+      - KONG_DECLARATIVE_CONFIG=/opt/conf/dbless_config/kong.yaml
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout # direct all logs to stdout and stderr
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_PROXY_STREAM_ERROR_LOG=/dev/stderr
+    networks:
+      - kong-net
+    ports:
+      - "8000:8000/tcp"
+      - "8001:8001/tcp"
+      - "8443:8443/tcp"
+      - "8444:8444/tcp"
+    volumes:
+      - ./plugins/src:/mnt/kong-plugins
+      - ./dbless_config:/opt/conf/dbless_config
+    restart: on-failure
+
+  # echo-server:
+  #   image: ealen/echo-server:latest
+  #   environment:
+  #     - ENABLE__ENVIRONMENT=false
+  #   networks:
+  #     - kong-net
+
+  # kong-migrations:
+  #   image: "${KONG_DOCKER_TAG:-kong:latest}"
+  #   command: kong migrations bootstrap
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     KONG_DATABASE: postgres
+  #     KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
+  #     KONG_PG_HOST: db
+  #     KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+  #     KONG_PG_USER: ${KONG_PG_USER:-kong}
+  #   links:
+  #     - db:db
+  #   networks:
+  #     - kong-net
+  #   restart: on-failure
+
+  # konga:
+  #   image: pantsel/konga
+  #   container_name: konga
+  #   depends_on:
+  #     - kong
+  #   environment:
+  #     NODE_ENV: production
+  #   links:
+  #     - kong:kong
+  #   networks:
+  #     - kong-net
+  #   ports:
+  #     - "1337:1337/tcp"
+  #   restart: on-failure
+  #   volumes:
+  #     - ./mount/kongadata:/app/kongadata
+
+
+  # db:
+  #   image: postgres:9.5
+  #   environment:
+  #     POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
+  #     POSTGRES_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+  #     POSTGRES_USER: ${KONG_PG_USER:-kong}
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-U", "${KONG_PG_USER:-kong}"]
+  #     interval: 30s
+  #     timeout: 30s
+  #     retries: 3
+  #   restart: on-failure
+  #   stdin_open: true
+  #   tty: true
+  #   networks:
+  #     - kong-net
+  #   volumes:
+  #     - ./mount/dbdata:/var/lib/postgresql/data
