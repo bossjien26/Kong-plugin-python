@@ -1,6 +1,6 @@
 mount/*
 !mount/.gitkeep
-*.sock
+# *.sock
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/python

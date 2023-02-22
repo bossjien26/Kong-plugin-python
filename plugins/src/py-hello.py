@@ -3,6 +3,8 @@
 # This script get from https://github.com/Kong/kong-python-pdk
 import os
 import kong_pdk.pdk.kong as kong
+from datetime import datetime, timedelta
+
 
 Schema = (
     {"message": {"type": "string"}},
@@ -18,10 +20,13 @@ class Plugin(object):
         self.config = config
 
     def access(self, kong: kong.kong):
+        # kong.response.set_header("x-wait-time", fmt.Sprintf("%d seconds", self.config['waitTime']))
+        
         host, err = kong.request.get_header("host")
         if err:
             kong.log.err(err)
         message = "hello"
+
         if 'message' in self.config:
             message = self.config['message']
         kong.response.set_header("x-hello-from-python", "Python says %s to %s" % (message, host))
