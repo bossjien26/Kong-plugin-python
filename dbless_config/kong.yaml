@@ -3,7 +3,7 @@ _transform: true
 
 services:
 - name: httpbin-svc
-  url: http://httpbin.org/anything
+  url: https://api.w3.org/doc
   routes:
   - name: example-route
     paths:

@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  kong-net:
+  kong-py-plugins_kong-net:
 
 services:
   kong:
@@ -20,7 +20,7 @@ services:
       - KONG_ADMIN_ERROR_LOG=/dev/stderr
       - KONG_PROXY_STREAM_ERROR_LOG=/dev/stderr
     networks:
-      - kong-net
+      - kong-py-plugins_kong-net
     ports:
       - "8001:8000/tcp"
       # - "8001:8001/tcp"
@@ -31,12 +31,21 @@ services:
       - ./dbless_config:/opt/conf/dbless_config
     restart: on-failure
 
+  prometheus:
+    container_name: kong-quickstart-prometheus
+    image: prom/prometheus:latest
+    networks:
+      - kong-py-plugins_kong-net
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
   # echo-server:
   #   image: ealen/echo-server:latest
   #   environment:
   #     - ENABLE__ENVIRONMENT=false
   #   networks:
-  #     - kong-net
+  #     - kong-py-plugins_kong-net
 
   # kong-migrations:
   #   image: "${KONG_DOCKER_TAG:-kong:latest}"
@@ -52,7 +61,7 @@ services:
   #   links:
   #     - db:db
   #   networks:
-  #     - kong-net
+  #     - kong-py-plugins_kong-net
   #   restart: on-failure
 
   # konga:
@@ -65,7 +74,7 @@ services:
   #   links:
   #     - kong:kong
   #   networks:
-  #     - kong-net
+  #     - kong-py-plugins_kong-net
   #   ports:
   #     - "1337:1337/tcp"
   #   restart: on-failure
@@ -88,6 +97,6 @@ services:
   #   stdin_open: true
   #   tty: true
   #   networks:
-  #     - kong-net
+  #     - kong-py-plugins_kong-net
   #   volumes:
   #     - ./mount/dbdata:/var/lib/postgresql/data

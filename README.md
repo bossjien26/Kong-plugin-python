@@ -12,4 +12,4 @@ docker compose up -d
 
 ### python
 > Path : plugin/src/py-hello.py
-
+host.docker.internal

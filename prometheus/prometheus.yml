@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: 'kong'
+    scrape_interval: 30s
+    metrics_path: '/any'
+    static_configs:
+      # - targets: ['172.17.0.1:8001']
+      - targets: ['host.docker.internal:8001']
